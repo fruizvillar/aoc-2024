@@ -1,43 +1,35 @@
-from pathlib import Path
 
-INPUTS = Path('inputs')
+from collections import Counter
+import lib
+from typing import override
 
 DAY = 1
 
-f = INPUTS / f'day_{DAY:02d}.txt'
-
-GOAL = 2020
-array = []
-
-found1 = False
-found2 = False
-
-for line in f.open().readlines():
-
-    n = int(line)
-
-    for a1 in array:
-
-        # Part 1
-        if not found1:
-            if a1 + n == GOAL:
-                print(f'Found (part 1), {n} + {a1}')
-                print(f'{n} * {a1}= {n * a1}')
-                found1 = True
-
-        # Part 2
-        if not found2:
-            for a2 in array:
-                if a1 + a2 + n == GOAL:
-                    print(f'Found (part 2), {n} + {a1} + {a2}')
-                    print(f'{n} * {a1} * {a2} = {n * a1 * a2}')
-                    found2 = True
-                    break
-
-        if found1 and found2:
-            break
-    else:
-        array.append(n)
-
-    if found1 and found2:
-        break
+class Solver(lib.Solver):
+    """https://adventofcode.com/2024/day/2"""
+    @override
+    def solve(self):
+        a0 = []
+        a1 = []
+            
+        for n0, n1 in self.read_lines_typed(int):
+            a0.append(n0)
+            a1.append(n1)
+        
+        result_1 = sum( abs(a-b) for (a, b) in zip(sorted(a0), sorted(a1)))
+        
+        self.resolved(result_1=result_1)
+        result_2 = 0
+        
+        count_1 = Counter(a1)
+        
+        for n in a0:
+            if occurencies := count_1.get(n, 0):
+                result_2 += n * occurencies
+        
+        self.resolved(result_2=result_2)
+        
+        
+        
+solver = Solver(DAY)
+solver()
