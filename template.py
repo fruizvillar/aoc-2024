@@ -1,9 +1,8 @@
 
-from collections import Counter
 import lib
 from typing import override
 
-DAY = 'XX-DAY-XX'
+DAY = int('XX-DAY-XX')
 
 class Solver(lib.Solver):
     """https://adventofcode.com/2024/day/XX-DAY-XX"""
