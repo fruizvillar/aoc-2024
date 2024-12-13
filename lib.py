@@ -1,5 +1,5 @@
-import pathlib
 import abc
+import pathlib
 
 INPUTS = pathlib.Path("inputs")
 

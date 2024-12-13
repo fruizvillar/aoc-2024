@@ -1,7 +1,8 @@
 """ Solver for AoC 2024 Day XX-DAY-XX"""
 
-import lib
 from typing import override
+
+import lib
 
 DAY = int("XX-DAY-XX")
 
