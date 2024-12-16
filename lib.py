@@ -5,6 +5,8 @@ INPUTS = pathlib.Path("inputs")
 
 
 class Solver(abc.ABC):
+    DEBUG = False
+    
     def __init__(self, day_of_month):
         self.day_of_month = day_of_month
 
@@ -16,10 +18,10 @@ class Solver(abc.ABC):
         with self.filename.open() as f:
             return f.read()
 
-    def read_lines_typed(self, type_):
+    def read_lines_typed(self, type_, sep=None):
         with self.filename.open() as f:
             for line in f.readlines():
-                yield tuple(map(type_, line.strip().split()))
+                yield tuple(map(type_, line.strip().split(sep)))
 
     @abc.abstractmethod
     def solve(self) -> None:
@@ -40,3 +42,8 @@ class Solver(abc.ABC):
             print("Result 1: Not resolved")
         if self.result_2 is None:
             print("Result 2: Not resolved")
+
+
+    def printd(self, *args, **kwargs):
+        if self.DEBUG:
+            print(*args, **kwargs)

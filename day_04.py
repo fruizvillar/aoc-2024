@@ -57,14 +57,9 @@ class DirectionWithDiagonals(enum.Enum):
                 DirectionWithDiagonals.DOWN_LEFT, DirectionWithDiagonals.DOWN_RIGHT]
 
 
-DEBUG = False
-
-def printd(*args, **kwargs):
-    if DEBUG:
-        print(*args, **kwargs)
-
 class Solver(lib.Solver):
     """https://adventofcode.com/2024/day/4"""
+
 
     @override
     def solve(self) -> None:
@@ -76,15 +71,15 @@ class Solver(lib.Solver):
         
         for x_pos in self.find_xmas_x():
             
-            printd()
-            printd("X___", x_pos, '+')
+            self.printd()
+            self.printd("X___", x_pos, '+')
             
             for m_pos, direction in self.find_xmas_m(x_pos):
-                printd("XM__", m_pos, direction)
+                self.printd("XM__", m_pos, direction)
                 if a_pos := self.is_xmas_a(m_pos, direction):
-                    printd("XMA_", a_pos, direction)
+                    self.printd("XMA_", a_pos, direction)
                     if s_pos:= self.is_xmas_s(a_pos, direction):
-                        printd("XMAS", s_pos, direction, tick)
+                        self.printd("XMAS", s_pos, direction, tick)
                         n_xmas += 1
         
                 
@@ -97,11 +92,11 @@ class Solver(lib.Solver):
         
         for m_pos in self.find_x_mas_m():
             
-            printd("M__", m_pos)
+            self.printd("M__", m_pos)
             for a_pos, direction in self.find_x_mas_a(m_pos):
-                printd("MA_", a_pos, direction)
+                self.printd("MA_", a_pos, direction)
                 if s_pos := self.is_x_mas_s(a_pos, direction):
-                    printd("MAS", s_pos, direction, tick)
+                    self.printd("MAS", s_pos, direction, tick)
                     mas_occurencies.append((m_pos, a_pos, s_pos))
                     
         mas_occurencies.sort(key=lambda x: x[1])
@@ -109,7 +104,7 @@ class Solver(lib.Solver):
         
         for a_location, count in a_locations.items():
             if count == 2:
-                printd(f"A is in two MAS in {a_location}")
+                self.printd(f"A is in two MAS in {a_location}")
                 n_x_mas += 1
                 continue
             if count == 3:
