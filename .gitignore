@@ -1,3 +1,8 @@
+# AoC inputs and results
+inputs/*.txt
+results/*.txt
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

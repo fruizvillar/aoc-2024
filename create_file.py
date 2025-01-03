@@ -42,14 +42,14 @@ def create_files(day: int):
     f_in = f_in.absolute()
 
     if f_in.exists():
-        print(f"File {f_in.as_uri()} already exists")
+        print(f"Input {f_in.as_uri()} already exists")
     else:
         f_in.touch()
         print(f"Created input file {f_in.as_uri()}")
 
     f_solution = pathlib.Path(__file__).parent / f"day_{day:02}.py"
     if f_solution.exists():
-        print(f"File {f_solution.as_uri()} already exists")
+        print(f"Solution {f_solution.as_uri()} already exists")
     else:
         with F_SOLUTION_TEMPLATE.open() as f:
             template = f.read()
