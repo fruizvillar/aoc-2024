@@ -25,7 +25,7 @@ class Solver(lib.Solver):
 
         maze = lib.Maze(register_symbol="ALL")
 
-        maze.load_from_pos_simbol_generator(
+        maze.load_from_pos_symbol_generator(
             self.read_maze_to_coords(), ignore_symbol=self.Symbol.EMPTY
         )
 
@@ -37,36 +37,45 @@ class Solver(lib.Solver):
 
         if self.DEBUG:
             for f, antinodes in antinodes_per_f.items():
-                print(f"Frequency {f} at locations {frequencies_and_locations[f]}: {antinodes}")
+                print(
+                    f"Frequency {f} at locations {frequencies_and_locations[f]}: {antinodes}"
+                )
 
         antinodes = set(itertools.chain(*antinodes_per_f.values()))
 
         maze.print(replace={x: self.Symbol.ANTI_NODE for x in antinodes})
 
         self.resolved(result_1=len(antinodes))
-        
-        antinodes_per_f = self.find_all_antinodes(frequencies_and_locations, maze, multiple_harmonics=True)
+
+        antinodes_per_f = self.find_all_antinodes(
+            frequencies_and_locations, maze, multiple_harmonics=True
+        )
         antinodes = set(itertools.chain(*antinodes_per_f.values()))
-        
+
         antinodes |= set(itertools.chain(*frequencies_and_locations.values()))
 
         maze.print(replace={x: self.Symbol.ANTI_NODE for x in antinodes})
 
         self.resolved(result_2=len(antinodes))
 
-    def find_all_antinodes(self, frequencies_and_locations, maze:lib.Maze, multiple_harmonics=False) -> dict[int, set[lib.Position2D]]:
+    def find_all_antinodes(
+        self, frequencies_and_locations, maze: lib.Maze, multiple_harmonics=False
+    ) -> dict[int, set[lib.Position2D]]:
         antinodes = {}
         for f, locs in frequencies_and_locations.items():
 
-            antinodes[f] = self.find_antinodes(locs,maze, multiple_harmonics)
-          
+            antinodes[f] = self.find_antinodes(locs, maze, multiple_harmonics)
+
         return antinodes
 
-    def find_antinodes(self, nodes, maze: lib.Maze, multiple_harmonics) -> set[lib.Position2D]:
+    def find_antinodes(
+        self, nodes, maze: lib.Maze, multiple_harmonics
+    ) -> set[lib.Position2D]:
         antinodes = set()
         for node_pair in itertools.combinations(nodes, 2):
-            antinodes |= self.calc_antinodes(*node_pair, maze, multiple_harmonics=multiple_harmonics)
-         
+            antinodes |= self.calc_antinodes(
+                *node_pair, maze, multiple_harmonics=multiple_harmonics
+            )
 
         return antinodes
 
@@ -80,21 +89,20 @@ class Solver(lib.Solver):
             return set()
 
         diff = b - a
-        
+
         antinodes = []
-        
+
         while (b := b + diff) in maze:
             antinodes.append(b)
-            
+
             if not multiple_harmonics:
                 break
-            
-        while (a:= a - diff) in maze:
+
+        while (a := a - diff) in maze:
             antinodes.append(a)
-            
+
             if not multiple_harmonics:
                 break
-            
 
         return set(antinodes)
 

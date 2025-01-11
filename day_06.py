@@ -45,7 +45,7 @@ class Solver(lib.Solver):
     def load_maze(self) -> lib.Maze:
         maze = lib.Maze(idx_symbol=self.Symbol.WALL, register_symbol=self.Symbol.GUARD)
 
-        maze.load_from_pos_simbol_generator(
+        maze.load_from_pos_symbol_generator(
             self.read_maze_to_coords(ignore_symbol=self.Symbol.EMPTY)
         )
 

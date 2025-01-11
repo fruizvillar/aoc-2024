@@ -5,7 +5,7 @@ import itertools
 import math
 import pathlib
 import re
-from typing import Iterable, Union
+from typing import Any, Iterable, Union
 
 import colorama
 
@@ -52,12 +52,12 @@ class Solver(abc.ABC):
                 else:
                     yield matched_bits
 
-    def read_maze_to_coords(self, ignore_symbol=None):
+    def read_maze_to_coords(self, ignore_symbol=None, type_=str):
         with self.filename.open() as f:
             for y, line in enumerate(f.readlines()):
                 for x, symbol in enumerate(line.strip()):
                     if symbol != ignore_symbol:
-                        yield Position2D(x, y), symbol
+                        yield Position2D(x, y), type_(symbol)
 
     @abc.abstractmethod
     def solve(self) -> None:
@@ -75,22 +75,33 @@ class Solver(abc.ABC):
         for i, result in enumerate((result_1, result_2), 1):
             if result is None:
                 continue
-            
+
             if (f_result := (RESULTS / f"day_{self.day_of_month:02}_{i}.txt")).exists():
                 with f_result.open() as f:
-                    if (saved_result:=f.read().strip()) == str(result):
+                    if (saved_result := f.read().strip()) == str(result):
                         print(f"Result {i} already exists and matches")
                         continue
-                    
-                    print(f"Result {i} already exists but does not match ({saved_result=}, {result=})")
-                    reply = input(f"Overwrite result {i}? (y/N) ").lower()
-            
+
+                    print(
+                        f"Result {i} already exists but does not match ({saved_result=}, {result=})"
+                    )
+                    to_save = self._ask_user_yn_safe(f"Overwrite result {i}?")
+
             else:
-                reply = input(f"Save result {i}? (y/N) ").lower()
-                
-            if reply == "y":
+                to_save = self._ask_user_yn_safe(f"Save result {i}?")
+
+            if to_save:
                 with f_result.open("w") as f:
                     f.write(str(result))
+                    
+    def _ask_user_yn_safe(self, prompt: str, default: bool=False) -> bool:
+        try:
+            reply = input(prompt + ' (y/N) ').lower()
+        except KeyboardInterrupt:
+            print('Ctrl-C detected. Cancelling.')
+            return default
+
+        return reply == 'y'
 
     def __call__(self):
         self.solve()
@@ -305,6 +316,7 @@ def directions_with_diagonals(order="cycle_from_up_left"):
 
 
 class Maze:
+    DEBUG = False
 
     def __init__(
         self, idx_symbol: str | None = None, register_symbol: str | None = None
@@ -318,23 +330,25 @@ class Maze:
         self.register_symbol = register_symbol
         self._colours = {}
 
-    def load_from_pos_simbol_generator(
-        self, pos_symbol_gen: Iterable[tuple[Position2D, str]], ignore_symbol=None
+    def load_from_pos_symbol_generator(
+        self, pos_symbol_gen: Iterable[tuple[Position2D, Any]], ignore_symbol=None
     ):
+        ignore_symbol = ignore_symbol or {}
         max_x = max_y = 0
 
         for pos, symbol in pos_symbol_gen:
             max_x = max(max_x, pos.x)
             max_y = max(max_y, pos.y)
-            
+
             if symbol == ignore_symbol or symbol in ignore_symbol:
                 continue
-            print(pos, symbol)
+            if self.DEBUG:
+                print(pos, symbol)
             self.maze[pos] = symbol
 
             if (
                 symbol == self.register_symbol
-                or symbol in self.register_symbol
+                or (hasattr(self.register_symbol, '__iter__') and symbol in self.register_symbol)
                 or self.register_symbol == "ALL"
             ):
                 self.registry[symbol].append(pos)
@@ -342,8 +356,6 @@ class Maze:
             if self.idx_symbol == symbol:
                 self.idx_x[pos.x].append(pos)
                 self.idx_y[pos.y].append(pos)
-
-
 
         self.h = max_y + 1
         self.w = max_x + 1
@@ -376,3 +388,12 @@ class Maze:
 
     def __contains__(self, pos: Position2D):
         return 0 <= pos.y < self.h and 0 <= pos.x < self.w
+    
+    def __getitem__(self, pos: Position2D):
+        return self.maze[pos]
+
+    def __setitem__(self, pos: Position2D, value: Any):
+        self.maze[pos] = value
+
+    def __delitem__(self, pos: Position2D):
+        del self.maze[pos]
