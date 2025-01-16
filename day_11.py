@@ -62,13 +62,14 @@ class Solver(lib.Solver):
         self.resolved(result_1=self._count_stones(stones))
         
         
+        # FIXME this takes too long
         for i in range(25, 50):
             print(f"After {i+1} blinks: {self._count_stones(stones)}")
             self.blink(stones)
             if self.DEBUG:
                 self._print_stones(stones)
         
-        self.resolved(result_2=None)
+        self.resolved(result_2=self._count_stones(stones))
 
     def blink(self, head: Stone):
         current = head
